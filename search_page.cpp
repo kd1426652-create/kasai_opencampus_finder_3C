@@ -29,4 +29,21 @@ void SchoolSearchPage() {
 
     Text(800, 140, "4.8 ★", GetColor(234, 179, 8), 16);
     Button(720, 185, 130, 38, "Detail", BLUE);
+
+    // Card 2: HAL Osaka
+    Panel(30, 285, 840, 135, 10, CARD, BORDER);
+    Panel(45, 297, 100, 24, 6, BLUE, BLUE);
+    Text(52, 301, "Osaka", WHITE, 12);
+    Panel(155, 297, 180, 24, 6, GetColor(51, 65, 85), BORDER);
+    Text(162, 301, "IT / Cyber Security", WHITE, 12);
+
+
+    Text(45, 330, "HAL Osaka", WHITE, 18);
+    Text(45, 360, "Located near Osaka Station, top school for Modern IT & Cyber Security.", GRAY, 13);
+    Text(45, 387, "Open Campus: 2026/11/22 (Sun)", LIGHT_BLUE, 13);
+
+
+    Text(800, 295, "4.7 ★", GetColor(234, 179, 8), 16);
+    Button(720, 340, 130, 38, "Detail", BLUE);
+
 }
