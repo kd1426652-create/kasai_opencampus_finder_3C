@@ -13,4 +13,20 @@ void SchoolSearchPage() {
     Panel(600, 18, 140, 40, 8, CARD, BORDER);
     Text(615, 28, "Q Find School", WHITE, 13);
     Button(750, 18, 120, 40, "Logout", RED);
+
+    // Card 1: ECC
+    Panel(30, 130, 840, 135, 10, CARD, BORDER);
+    Panel(45, 142, 100, 24, 6, BLUE, BLUE);
+    Text(52, 146, "Osaka", WHITE, 12);
+    Panel(155, 142, 210, 24, 6, GetColor(51, 65, 85), BORDER);
+    Text(162, 146, "IT & Software / Web / Game", WHITE, 12);
+
+
+    Text(45, 175, "ECC Computer Academy", WHITE, 18);
+    Text(45, 205, "Located in Osaka Umeda, specializing in IT Programming, AI & Game Dev.", GRAY, 13);
+    Text(45, 232, "Open Campus: 2026/11/15 (Sun)", LIGHT_BLUE, 13);
+
+
+    Text(800, 140, "4.8 ★", GetColor(234, 179, 8), 16);
+    Button(720, 185, 130, 38, "Detail", BLUE);
 }
