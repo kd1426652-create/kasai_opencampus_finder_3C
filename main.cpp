@@ -1,4 +1,3 @@
-
 #include "DxLib.h"
 #include <iostream>
 #include <fstream>
@@ -9,18 +8,18 @@
 
 using namespace std;
 
-// ============================================
-// WINDOW SETTINGS
-// ============================================
+// ============================================================================
+// ズンワタン＿WINDOW & FILE CONSTANTS
+// ============================================================================
 
 const int SW = 900;
 const int SH = 780;
 
 const char* DATA_FILE = "schools.txt";
 
-// ============================================
-// SCHOOL DATA
-// ============================================
+// ============================================================================
+// ニンチュー＿SCHOOL DATA STRUCTURE
+// ============================================================================
 
 struct School
 {
@@ -30,13 +29,14 @@ struct School
     string openDate;
     string rating;
     string description;
+    // [TODO: ニンチュー] imagePath と imageHandle をここに追加してください
 };
 
 vector<School> schools;
 
-// ============================================
-// PAGE MANAGEMENT
-// ============================================
+// ============================================================================
+// ミィンミャッ テイ＿ PAGE MANAGEMENT & GLOBAL STATE
+// ============================================================================
 
 enum Page
 {
@@ -44,6 +44,7 @@ enum Page
     ADMIN_PAGE,
     STUDENT_PAGE,
     SCHOOL_FORM_PAGE
+    // [TODO: ミィンミャッ テイ] SCHOOL_DETAIL_PAGE をここに追加してください
 };
 
 Page currentPage = LOGIN_PAGE;
@@ -54,9 +55,9 @@ int selectedSchool = -1;
 int activeField = 0;
 bool isEditMode = false;
 
-// ============================================
-// FORM DATA
-// ============================================
+// ============================================================================
+// ケケ ゾ トィ＿ SCHOOL FORM DATA
+// ============================================================================
 
 string formFields[6];
 
@@ -70,9 +71,11 @@ string fieldNames[6] =
     "Description"
 };
 
-// ============================================
-// MOUSE
-// ============================================
+// ============================================================================
+// ミィンミャッ テイ＿MOUSE & UI COMPONENTS
+// ============================================================================
+
+// [TODO: ミィンミャッ テイ] UpdateMouse() と Pagination (GetTotalPages, NormalizeListPage) をここに追加してください
 
 bool MouseClicked()
 {
@@ -114,10 +117,6 @@ bool Button(int x, int y, int w, int h, const char* text)
     return hover && MouseClicked();
 }
 
-// ============================================
-// TEXT DRAWING
-// ============================================
-
 void DrawText(int x, int y, const string& text)
 {
     DrawString(
@@ -148,9 +147,11 @@ void DrawBackground()
     );
 }
 
-// ============================================
-// FILE SAVE
-// ============================================
+// ============================================================================
+// ニンチュー＿FILE SAVE, LOAD & IMAGE HANDLING
+// ============================================================================
+
+// [TODO: ニンチュー] LoadSchoolImages(), ReleaseFormImage(), ReleaseSchoolImages(), CopyAndSelectSchoolImage() をここに追加してください
 
 string CleanText(string value)
 {
@@ -188,10 +189,6 @@ void SaveSchools()
 
     file.close();
 }
-
-// ============================================
-// FILE LOAD
-// ============================================
 
 void LoadSchools()
 {
@@ -250,9 +247,9 @@ void LoadSchools()
     file.close();
 }
 
-// ============================================
-// LOGIN PAGE
-// ============================================
+// ============================================================================
+// リンレッ レッ カイン＿AUTHENTICATION (LOGIN PAGE & INPUT)
+// ============================================================================
 
 string email = "";
 string password = "";
@@ -314,10 +311,6 @@ void DrawLoginPage()
     );
 }
 
-// ============================================
-// LOGIN INPUT
-// ============================================
-
 void HandleLoginInput()
 {
     int mx, my;
@@ -368,9 +361,11 @@ void HandleLoginInput()
     previousBack = back;
 }
 
-// ============================================
-// ADMIN DASHBOARD
-// ============================================
+// ============================================================================
+// ケケ ゾ トィ＿ADMIN DASHBOARD & SCHOOL FORM (ADD / EDIT / SAVE / CANCEL)
+// ============================================================================
+
+// [TODO: ケケ ゾ トィ] StartAddSchool(), StartEditSchool(), CancelSchoolForm(), SaveSchoolForm() をここに追加してください
 
 void DrawAdminPage()
 {
@@ -421,9 +416,134 @@ void DrawAdminPage()
     );
 }
 
-// ============================================
-// SCHOOL LIST
-// ============================================
+void DrawSchoolForm()
+{
+    DrawBackground();
+
+    DrawString(
+        330, 85,
+        isEditMode ? "EDIT SCHOOL" : "ADD NEW SCHOOL",
+        GetColor(255, 210, 100)
+    );
+
+    for (int i = 0; i < 6; i++)
+    {
+        int y = 145 + i * 75;
+
+        DrawString(
+            100, y,
+            fieldNames[i].c_str(),
+            GetColor(255, 255, 255)
+        );
+
+        DrawBox(
+            100, y + 25,
+            800, y + 65,
+            activeField == i
+            ? GetColor(65, 85, 120)
+            : GetColor(40, 45, 60),
+            TRUE
+        );
+
+        DrawText(
+            115,
+            y + 35,
+            formFields[i]
+        );
+    }
+
+    DrawString(
+        100, 610,
+        "Click a field and type. Backspace to delete characters.",
+        GetColor(180, 180, 180)
+    );
+
+    if (Button(100, 680, 180, 45, "SAVE"))
+    {
+        if (!formFields[0].empty())
+        {
+            School s;
+
+            s.name = formFields[0];
+            s.location = formFields[1];
+            s.course = formFields[2];
+            s.openDate = formFields[3];
+            s.rating = formFields[4];
+            s.description = formFields[5];
+
+            if (isEditMode &&
+                selectedSchool >= 0 &&
+                selectedSchool < (int)schools.size())
+            {
+                schools[selectedSchool] = s;
+            }
+            else
+            {
+                schools.push_back(s);
+            }
+
+            SaveSchools();
+
+            selectedSchool = -1;
+            currentPage = ADMIN_PAGE;
+        }
+    }
+
+    if (Button(320, 680, 180, 45, "CANCEL"))
+    {
+        selectedSchool = -1;
+        currentPage = ADMIN_PAGE;
+    }
+}
+
+void HandleFormInput()
+{
+    int mx, my;
+    GetMousePoint(&mx, &my);
+
+    if (MouseClicked())
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            int y = 145 + i * 75;
+
+            if (mx >= 100 && mx <= 800 &&
+                my >= y + 25 && my <= y + 65)
+            {
+                activeField = i;
+            }
+        }
+    }
+
+    int ch;
+
+    while ((ch = GetInputChar(TRUE)) != 0)
+    {
+        if (ch >= 32 && ch <= 126)
+        {
+            if (formFields[activeField].length() < 100)
+                formFields[activeField] += (char)ch;
+        }
+    }
+
+    static bool previousBack = false;
+
+    bool back = CheckHitKey(KEY_INPUT_BACK);
+
+    if (back && !previousBack)
+    {
+        if (!formFields[activeField].empty())
+            formFields[activeField].pop_back();
+    }
+
+    previousBack = back;
+}
+
+// ============================================================================
+// スス ニェイン＿ SCHOOL LIST & DETAIL VIEW
+// ============================================================================
+
+// [TODO: スス ニェイン] DrawSchoolDetailPage() をここに追加してください
 
 void DrawSchoolList()
 {
@@ -551,140 +671,9 @@ void DrawSchoolList()
     }
 }
 
-// ============================================
-// SCHOOL FORM
-// ============================================
-
-void DrawSchoolForm()
-{
-    DrawBackground();
-
-    DrawString(
-        330, 85,
-        isEditMode ? "EDIT SCHOOL" : "ADD NEW SCHOOL",
-        GetColor(255, 210, 100)
-    );
-
-    for (int i = 0; i < 6; i++)
-    {
-        int y = 145 + i * 75;
-
-        DrawString(
-            100, y,
-            fieldNames[i].c_str(),
-            GetColor(255, 255, 255)
-        );
-
-        DrawBox(
-            100, y + 25,
-            800, y + 65,
-            activeField == i
-            ? GetColor(65, 85, 120)
-            : GetColor(40, 45, 60),
-            TRUE
-        );
-
-        DrawText(
-            115,
-            y + 35,
-            formFields[i]
-        );
-    }
-
-    DrawString(
-        100, 610,
-        "Click a field and type. Backspace to delete characters.",
-        GetColor(180, 180, 180)
-    );
-
-    if (Button(100, 680, 180, 45, "SAVE"))
-    {
-        if (!formFields[0].empty())
-        {
-            School s;
-
-            s.name = formFields[0];
-            s.location = formFields[1];
-            s.course = formFields[2];
-            s.openDate = formFields[3];
-            s.rating = formFields[4];
-            s.description = formFields[5];
-
-            if (isEditMode &&
-                selectedSchool >= 0 &&
-                selectedSchool < (int)schools.size())
-            {
-                schools[selectedSchool] = s;
-            }
-            else
-            {
-                schools.push_back(s);
-            }
-
-            SaveSchools();
-
-            selectedSchool = -1;
-            currentPage = ADMIN_PAGE;
-        }
-    }
-
-    if (Button(320, 680, 180, 45, "CANCEL"))
-    {
-        selectedSchool = -1;
-        currentPage = ADMIN_PAGE;
-    }
-}
-
-// ============================================
-// SCHOOL FORM INPUT
-// ============================================
-
-void HandleFormInput()
-{
-    int mx, my;
-    GetMousePoint(&mx, &my);
-
-    if (MouseClicked())
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            int y = 145 + i * 75;
-
-            if (mx >= 100 && mx <= 800 &&
-                my >= y + 25 && my <= y + 65)
-            {
-                activeField = i;
-            }
-        }
-    }
-
-    int ch;
-
-    while ((ch = GetInputChar(TRUE)) != 0)
-    {
-        if (ch >= 32 && ch <= 126)
-        {
-            if (formFields[activeField].length() < 100)
-                formFields[activeField] += (char)ch;
-        }
-    }
-
-    static bool previousBack = false;
-
-    bool back = CheckHitKey(KEY_INPUT_BACK);
-
-    if (back && !previousBack)
-    {
-        if (!formFields[activeField].empty())
-            formFields[activeField].pop_back();
-    }
-
-    previousBack = back;
-}
-
-// ============================================
-// MAIN
-// ============================================
+// ============================================================================
+// ズンワタン＿MAIN ENTRY POINT & SYSTEM INTEGRATION
+// ============================================================================
 
 int WINAPI WinMain(
     HINSTANCE hInstance,
