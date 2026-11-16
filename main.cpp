@@ -43,7 +43,10 @@ enum Page
     LOGIN_PAGE,
     ADMIN_PAGE,
     STUDENT_PAGE,
-    SCHOOL_FORM_PAGE
+    SCHOOL_FORM_PAGE,
+    SCHOOL_DETAIL_PAGE,
+    
+
     // [TODO: ミィンミャッ テイ] SCHOOL_DETAIL_PAGE をここに追加してください
 };
 
@@ -77,6 +80,30 @@ string fieldNames[6] =
 
 // [TODO: ミィンミャッ テイ] UpdateMouse() と Pagination (GetTotalPages, NormalizeListPage) をここに追加してください
 
+Page formReturnPage = ADMIN_PAGE;
+int listPage = 0;
+const int ITEMS_PER_PAGE = 4;
+int currentMouse = 0;
+int previousMouse = 0;
+void UpdateMouse()
+{
+    previousMouse = currentMouse;
+    currentMouse = GetMouseInput();
+}
+int GetTotalPages()
+{
+    if (schools.empty())
+        return 1;
+    return ((int)schools.size() + ITEMS_PER_PAGE - 1) / ITEMS_PER_PAGE;
+}
+void NormalizeListPage()
+{
+    int totalPages = GetTotalPages();
+    if (listPage < 0)
+        listPage = 0;
+    if (listPage >= totalPages)
+        listPage = totalPages - 1;
+}
 bool MouseClicked()
 {
     static int previousMouse = 0;
