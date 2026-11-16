@@ -29,6 +29,9 @@ struct School
     string openDate;
     string rating;
     string description;
+    string imagePath;
+    int imageHandle = -1;
+
     // [TODO: ニンチュー] imagePath と imageHandle をここに追加してください
 };
 
@@ -179,7 +182,84 @@ void DrawBackground()
 // ============================================================================
 
 // [TODO: ニンチュー] LoadSchoolImages(), ReleaseFormImage(), ReleaseSchoolImages(), CopyAndSelectSchoolImage() をここに追加してください
+string formImagePath = "";
+string formOriginalImagePath = "";
+int formImageHandle = -1;
+string loginMessage = "";
+void ReleaseFormImage()
+{
+    if (formImageHandle != -1)
+    {
+        DeleteGraph(formImageHandle);
+        formImageHandle = -1;
+    }
+}
+void LoadSchoolImages()
+{
+    for (int i = 0; i < (int)schools.size(); i++)
+    {
+        if (!schools[i].imagePath.empty() && schools[i].imageHandle == -1)
+        {
+            schools[i].imageHandle = LoadGraph(schools[i].imagePath.c_str());
+        }
+    }
+}
+void ReleaseSchoolImages()
+{
+    for (int i = 0; i < (int)schools.size(); i++)
+    {
+        if (schools[i].imageHandle != -1)
+        {
+            DeleteGraph(schools[i].imageHandle);
+            schools[i].imageHandle = -1;
+        }
+    }
+}
+bool CopyAndSelectSchoolImage(const char* fileName)
+{
+    static unsigned int counter = 0;
+    const char* ext = strrchr(fileName, '.');
+    if (!ext) return false;
+    char destination[MAX_PATH];
+    bool copied = false;
+    for (int i = 0; i < 100; i++)
+    {
 
+        counter++;
+        sprintf_s(destination, "images\\school_%llu_%u%s", GetTickCount64(),
+            counter, ext);
+        if (CopyFileA(fileName, destination, TRUE))
+        {
+            copied = true;
+            break;
+        }
+    }
+    if (!copied)
+    {
+        loginMessage = "Cannot copy image!";
+        return false;
+    }
+    if (!formImagePath.empty() && formImagePath != formOriginalImagePath)
+    {
+        DeleteFileA(formImagePath.c_str());
+    }
+    ReleaseFormImage();
+    formImagePath = destination;
+    formImageHandle = LoadGraph(formImagePath.c_str());
+    if (formImageHandle == -1)
+    {
+        DeleteFileA(formImagePath.c_str());
+        formImagePath = formOriginalImagePath;
+        if (!formImagePath.empty())
+        {
+            formImageHandle = LoadGraph(formImagePath.c_str());
+        }
+        loginMessage = "Cannot load image!";
+        return false;
+    }
+    loginMessage = "Image selected successfully!";
+    return true;
+}
 string CleanText(string value)
 {
     // TXT delimiter is |
