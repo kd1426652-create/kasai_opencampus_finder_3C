@@ -473,7 +473,100 @@ void HandleLoginInput()
 // ============================================================================
 
 // [TODO: ケケ ゾ トィ] StartAddSchool(), StartEditSchool(), CancelSchoolForm(), SaveSchoolForm() をここに追加してください
-
+void StartAddSchool()
+{
+isEditMode = false;
+selectedSchool = -1;
+for (int i = 0; i < 6; i++)
+formFields[i] = "";
+ReleaseFormImage();
+formImagePath = "";
+formOriginalImagePath = "";
+activeField = 0;
+formReturnPage = ADMIN_PAGE;
+loginMessage = "";
+currentPage = SCHOOL_FORM_PAGE;
+}
+void StartEditSchool()
+{
+if (selectedSchool < 0 || selectedSchool >= (int)schools.size())
+return;
+isEditMode = true;
+School& s = schools[selectedSchool];
+formFields[0] = s.name;
+formFields[1] = s.location;
+formFields[2] = s.course;
+formFields[3] = s.openDate;
+formFields[4] = s.rating;
+formFields[5] = s.description;
+ReleaseFormImage();
+formOriginalImagePath = s.imagePath;
+formImagePath = s.imagePath;
+if (!formImagePath.empty())
+{
+formImageHandle = LoadGraph(formImagePath.c_str());
+}
+activeField = 0;
+formReturnPage = SCHOOL_DETAIL_PAGE;
+loginMessage = "";
+currentPage = SCHOOL_FORM_PAGE;
+}
+void CancelSchoolForm()
+{
+ReleaseFormImage();
+if (!formImagePath.empty() && formImagePath != formOriginalImagePath)
+{
+DeleteFileA(formImagePath.c_str());
+}
+formImagePath = "";
+formOriginalImagePath = "";
+currentPage = formReturnPage;
+}
+void SaveSchoolForm()
+{
+if (formFields[0].empty())
+{
+loginMessage = "School Name is required!";
+return;
+}
+School s;
+s.name = formFields[0];
+s.location = formFields[1];
+s.course = formFields[2];
+s.openDate = formFields[3];
+s.rating = formFields[4];
+s.description = formFields[5];
+s.imagePath = formImagePath;
+s.imageHandle = -1;
+int index = -1;
+if (isEditMode && selectedSchool >= 0 && selectedSchool < (int)schools.size())
+{
+School& oldSchool = schools[selectedSchool];
+string oldPath = oldSchool.imagePath;
+if (oldSchool.imageHandle != -1)
+{
+DeleteGraph(oldSchool.imageHandle);
+}
+if (!oldPath.empty() && oldPath != s.imagePath)
+{
+DeleteFileA(oldPath.c_str());
+}
+schools[selectedSchool] = s;
+index = selectedSchool;
+}
+else
+{
+schools.push_back(s);
+index = (int)schools.size() - 1;
+}
+schools[index].imageHandle = formImageHandle;
+formImageHandle = -1;
+formImagePath = "";
+formOriginalImagePath = "";
+SaveSchools();
+selectedSchool = index;
+currentPage = SCHOOL_DETAIL_PAGE;
+}
 void DrawAdminPage()
 {
     DrawBackground();
